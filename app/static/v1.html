@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rezept0r</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/v1.css?v=2">
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
+  <main class="page-shell">
+    <section class="hero">
+      <p class="eyebrow">Rezept0r v1</p>
+      <h1>Rezepte aus Social, Video<br>und Web extrahieren</h1>
+      <p class="hero-copy">
+        URL einfügen, analysieren lassen und direkt nach Tandoor importieren.
+      </p>
+
+      <section class="input-section">
+        <div class="url-form">
+          <input
+            type="url"
+            id="url-input"
+            placeholder="https://example.com/rezept oder YouTube/TikTok URL..."
+            autocomplete="off"
+          />
+          <button id="extract-btn" type="button">Extrahieren</button>
+        </div>
+
+        <div class="platform-strip" aria-label="Unterstützte Plattformen">
+          <div class="platform-pill"><span class="platform-icon">▶</span><span>YouTube</span></div>
+          <div class="platform-pill"><span class="platform-icon">♪</span><span>TikTok</span></div>
+          <div class="platform-pill"><span class="platform-icon">◎</span><span>Instagram</span></div>
+          <div class="platform-pill"><span class="platform-icon">P</span><span>Pinterest</span></div>
+          <div class="platform-pill"><span class="platform-icon">⛶</span><span>Webseiten</span></div>
+        </div>
+      </section>
+    </section>
+
+    <section id="progress-section" class="hidden">
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <p id="progress-message" class="progress-message"></p>
+    </section>
+
+    <section id="result-section" class="hidden">
+      <div id="recipe-card" class="recipe-card">
+        <div class="recipe-header">
+          <img id="recipe-image" class="recipe-image hidden" src="" alt="Rezeptbild" />
+          <div class="recipe-meta">
+            <h2 id="recipe-title"></h2>
+            <p id="recipe-description" class="recipe-description"></p>
+            <div class="meta-tags">
+              <span id="recipe-servings" class="meta-tag hidden">
+                <span id="servings-value"></span>
+              </span>
+              <span id="recipe-prep" class="meta-tag hidden">
+                Vorbereitung: <span id="prep-value"></span> Min.
+              </span>
+              <span id="recipe-cook" class="meta-tag hidden">
+                Kochen: <span id="cook-value"></span> Min.
+              </span>
+              <span id="recipe-kcal" class="meta-tag hidden">
+                <span id="kcal-value"></span> kcal
+                <span id="kcal-source" class="kcal-source"></span>
+              </span>
+            </div>
+            <div id="recipe-tags" class="tag-list"></div>
+          </div>
+        </div>
+
+        <div class="recipe-body">
+          <div class="ingredients-section">
+            <h3>Zutaten</h3>
+            <ul id="ingredients-list" class="ingredients-list"></ul>
+          </div>
+
+          <div class="steps-section">
+            <h3>Zubereitung</h3>
+            <ol id="steps-list" class="steps-list"></ol>
+          </div>
+        </div>
+
+        <div class="recipe-actions">
+          <a id="source-link" href="#" target="_blank" class="btn btn-secondary">Originalrezept</a>
+          <button id="import-btn" class="btn btn-primary">In Tandoor importieren</button>
+          <span id="import-status" class="import-status"></span>
+        </div>
+      </div>
+
+      <div id="tandoor-fallback" class="hidden">
+        <h3>Tandoor JSON (manueller Import)</h3>
+        <p class="fallback-note">Kopiere dieses JSON in Tandoor unter Einstellungen → Import.</p>
+        <textarea id="tandoor-json" class="json-textarea" readonly></textarea>
+        <button id="copy-json-btn" class="btn btn-secondary">JSON kopieren</button>
+      </div>
+    </section>
+
+    <section id="error-section" class="hidden">
+      <div class="error-box">
+        <p id="error-message"></p>
+      </div>
+    </section>
+
+    <section id="history-section" class="hidden">
+      <h2 class="section-heading">Verlauf</h2>
+      <div id="history-list"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js?v=4"></script>
+</body>
+</html>

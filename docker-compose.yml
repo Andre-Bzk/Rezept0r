@@ -1,0 +1,14 @@
+services:
+  rezeptor:
+    build: .
+    image: rezeptor:latest
+    container_name: rezeptor
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "88:8000"
+    volumes:
+      - ./tmp:/app/tmp
+    mem_limit: 512m
+    memswap_limit: 512m   # No swap – protect SD card
