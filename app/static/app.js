@@ -280,10 +280,11 @@ function buildHistoryCard(entry) {
   const header = document.createElement('div');
   header.className = 'history-card-header';
 
-  if (recipe.image_url) {
+  const imageUrl = entry.image_url || recipe.image_url;
+  if (imageUrl) {
     const img = document.createElement('img');
     img.className = 'history-thumb';
-    img.src = recipe.image_url;
+    img.src = imageUrl;
     img.alt = '';
     img.onerror = () => img.remove();
     header.appendChild(img);

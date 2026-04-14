@@ -4,7 +4,9 @@ import asyncio
 import json
 import logging
 import os
+import subprocess
 import uuid
+from functools import partial
 from pathlib import Path
 from typing import AsyncGenerator
 
@@ -122,19 +124,20 @@ def _ffmpeg_args() -> list[str]:
     return ["--ffmpeg-location", loc] if loc else []
 
 
+async def _run_yt_dlp(*args: str, timeout: int) -> tuple[bytes, bytes, int]:
+    """Run yt-dlp in a thread executor — works on any event loop (Windows + Linux)."""
+    loop = asyncio.get_event_loop()
+    func = partial(subprocess.run, args, capture_output=True, timeout=timeout)
+    result = await loop.run_in_executor(None, func)
+    return result.stdout, result.stderr, result.returncode
+
+
 async def _get_metadata(url: str) -> dict:
     """Run yt-dlp --dump-json to get metadata without downloading."""
-    proc = await asyncio.create_subprocess_exec(
-        "yt-dlp",
-        "--dump-json",
-        "--no-playlist",
-        *_ffmpeg_args(),
-        url,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
+    stdout, stderr, returncode = await _run_yt_dlp(
+        "yt-dlp", "--dump-json", "--no-playlist", *_ffmpeg_args(), url, timeout=60
     )
-    stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=60)
-    if proc.returncode != 0:
+    if returncode != 0:
         err = stderr.decode(errors="replace")
         _check_tiktok_error(err, url)
         raise RuntimeError(f"yt-dlp Metadaten-Fehler: {err[:500]}")
@@ -148,26 +151,23 @@ async def _download_audio(url: str, output_path: Path) -> None:
     """Download audio only via yt-dlp subprocess (non-blocking)."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    proc = await asyncio.create_subprocess_exec(
-        "yt-dlp",
-        "--no-playlist",
-        "--extract-audio",
-        "--audio-format", "mp3",
-        "--audio-quality", "5",
-        "--max-filesize", MAX_FILESIZE,
-        *_ffmpeg_args(),
-        "--output", str(output_path).replace(".mp3", ".%(ext)s"),
-        url,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
     try:
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=300)
-    except asyncio.TimeoutError:
-        proc.kill()
+        stdout, stderr, returncode = await _run_yt_dlp(
+            "yt-dlp",
+            "--no-playlist",
+            "--extract-audio",
+            "--audio-format", "mp3",
+            "--audio-quality", "5",
+            "--max-filesize", MAX_FILESIZE,
+            *_ffmpeg_args(),
+            "--output", str(output_path).replace(".mp3", ".%(ext)s"),
+            url,
+            timeout=300,
+        )
+    except subprocess.TimeoutExpired:
         raise RuntimeError("Audio-Download Timeout (5 Min.) überschritten.")
 
-    if proc.returncode != 0:
+    if returncode != 0:
         err = stderr.decode(errors="replace")
         _check_tiktok_error(err, url)
         raise RuntimeError(f"Audio-Download fehlgeschlagen: {err[:500]}")

@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     tmp_dir: str = "/app/tmp"
+    images_dir: str = "/app/data/images"
     ffmpeg_location: str = ""  # Optional: full path to ffmpeg binary dir (for Windows local dev)
 
 

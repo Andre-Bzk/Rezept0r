@@ -10,5 +10,6 @@ services:
       - "88:8000"
     volumes:
       - ./tmp:/app/tmp
+      - ./data:/app/data
     mem_limit: 512m
     memswap_limit: 512m   # No swap – protect SD card

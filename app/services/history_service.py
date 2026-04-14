@@ -11,7 +11,7 @@ from app.config import get_settings
 
 def _db_path() -> Path:
     settings = get_settings()
-    return Path(settings.tmp_dir).parent / "history.db"
+    return Path(settings.images_dir).parent / "history.db"
 
 
 def init_db() -> None:
@@ -70,6 +70,15 @@ def get_all() -> list[dict]:
 def delete_recipe(history_id: int) -> None:
     with sqlite3.connect(_db_path()) as conn:
         conn.execute("DELETE FROM recipe_history WHERE id = ?", (history_id,))
+        conn.commit()
+
+
+def update_image_url(history_id: int, image_url: str) -> None:
+    with sqlite3.connect(_db_path()) as conn:
+        conn.execute(
+            "UPDATE recipe_history SET image_url = ? WHERE id = ?",
+            (image_url, history_id),
+        )
         conn.commit()
 
 
