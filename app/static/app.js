@@ -427,6 +427,15 @@ function buildHistoryCard(entry) {
     bodyInner.appendChild(stepsSection);
   }
 
+  // Hero-Bild im aufgeklappten Zustand (vor bodyInner einfügen)
+  if (imageUrl) {
+    const heroImg = document.createElement('img');
+    heroImg.className = 'recipe-image';
+    heroImg.src = imageUrl;
+    heroImg.alt = '';
+    heroImg.onerror = () => heroImg.remove();
+    body.appendChild(heroImg);
+  }
   body.appendChild(bodyInner);
 
   // Actions
