@@ -55,8 +55,12 @@ TANDOOR_API_TOKEN=tda_...
 | `USDA_API_KEY` | Nein | USDA FoodData Central Key (Standard: `DEMO_KEY`) |
 | `TANDOOR_BASE_URL` | Nein | URL der Tandoor-Instanz |
 | `TANDOOR_API_TOKEN` | Nein | Tandoor Bearer-Token |
-| `TMP_DIR` | Nein | Verzeichnis fuer temporaere Audio-Dateien (Standard: `/app/tmp`) |
+| `TMP_DIR` | Nein | Verzeichnis fuer temporaere Audio-Dateien (Standard: `tmp`, also `<Projekt>/tmp` bzw. im Container `/app/tmp`) |
 | `FFMPEG_LOCATION` | Nein | Pfad zu ffmpeg (nur fuer lokale Windows-Entwicklung) |
+
+Bilder und Verlauf-DB liegen immer fest unter `<Projekt>/data` bzw. im Container unter `/app/data`:
+- Bilder: `data/images`
+- SQLite: `data/history.db`
 
 ### 3. Starten
 

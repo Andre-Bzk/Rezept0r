@@ -11,7 +11,7 @@ from app.config import get_settings
 
 def _db_path() -> Path:
     settings = get_settings()
-    return Path(settings.images_dir).parent / "history.db"
+    return Path(settings.history_db_path)
 
 
 def init_db() -> None:
