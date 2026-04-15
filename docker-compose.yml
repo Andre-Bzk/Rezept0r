@@ -10,7 +10,7 @@ services:
     ports:
       - "88:8000"
     volumes:
-      - /volume1/docker/rezept0r/tmp:/app/tmp
-      - /volume1/docker/rezept0r/data:/app/data
+      - ${REZEPTOR_TMP_DIR:-./tmp}:/app/tmp
+      - ${REZEPTOR_DATA_DIR:-./data}:/app/data
     mem_limit: 512m
     memswap_limit: 512m   # No swap – protect SD card
