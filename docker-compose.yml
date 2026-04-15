@@ -5,7 +5,8 @@ services:
     container_name: rezeptor
     restart: unless-stopped
     env_file:
-      - .env
+      - path: .env
+        required: false
     ports:
       - "88:8000"
     volumes:
