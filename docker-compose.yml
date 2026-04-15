@@ -7,6 +7,17 @@ services:
     env_file:
       - path: .env
         required: false
+    environment:
+      - OPENAI_API_KEY
+      - USDA_API_KEY
+      - TANDOOR_BASE_URL
+      - TANDOOR_API_TOKEN
+      - TMP_DIR
+      - APP_HOST
+      - APP_PORT
+      - FFMPEG_LOCATION
+      - APP_UID
+      - APP_GID
     ports:
       - "88:8000"
     volumes:
