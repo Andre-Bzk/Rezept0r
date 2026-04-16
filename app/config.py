@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     app_port: int = 8000
     tmp_dir: str = "tmp"
     ffmpeg_location: str = ""  # Optional: full path to ffmpeg binary dir (for Windows local dev)
-
     @field_validator("tmp_dir", "ffmpeg_location", mode="before")
     @classmethod
     def _resolve_project_relative_paths(cls, value: str) -> str:

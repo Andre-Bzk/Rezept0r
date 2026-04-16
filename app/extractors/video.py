@@ -118,10 +118,13 @@ async def extract_video(url: str) -> AsyncGenerator[StatusEvent | Recipe, None]:
                 log.warning("Could not delete tmp file %s: %s", audio_path, e)
 
 
-def _ffmpeg_args() -> list[str]:
-    """Return --ffmpeg-location args if configured, else empty list."""
-    loc = get_settings().ffmpeg_location
-    return ["--ffmpeg-location", loc] if loc else []
+def _ytdlp_extra_args() -> list[str]:
+    """Return optional yt-dlp flags from settings (ffmpeg, proxy, cookies)."""
+    settings = get_settings()
+    args: list[str] = []
+    if settings.ffmpeg_location and Path(settings.ffmpeg_location).exists():
+        args += ["--ffmpeg-location", settings.ffmpeg_location]
+    return args
 
 
 async def _run_yt_dlp(*args: str, timeout: int) -> tuple[bytes, bytes, int]:
@@ -135,7 +138,7 @@ async def _run_yt_dlp(*args: str, timeout: int) -> tuple[bytes, bytes, int]:
 async def _get_metadata(url: str) -> dict:
     """Run yt-dlp --dump-json to get metadata without downloading."""
     stdout, stderr, returncode = await _run_yt_dlp(
-        "yt-dlp", "--dump-json", "--no-playlist", *_ffmpeg_args(), url, timeout=60
+        "yt-dlp", "--dump-json", "--no-playlist", *_ytdlp_extra_args(), url, timeout=60
     )
     if returncode != 0:
         err = stderr.decode(errors="replace")
@@ -159,7 +162,7 @@ async def _download_audio(url: str, output_path: Path) -> None:
             "--audio-format", "mp3",
             "--audio-quality", "5",
             "--max-filesize", MAX_FILESIZE,
-            *_ffmpeg_args(),
+            *_ytdlp_extra_args(),
             "--output", str(output_path).replace(".mp3", ".%(ext)s"),
             url,
             timeout=300,
@@ -197,10 +200,18 @@ def _get_thumbnail(metadata: dict) -> str | None:
 
 
 def _check_tiktok_error(stderr: str, url: str) -> None:
-    """Raise a clear error for TikTok login/cookie issues."""
-    if "tiktok" in url.lower():
-        if any(phrase in stderr.lower() for phrase in ["login", "cookie", "captcha", "403"]):
-            raise RuntimeError(
-                "TikTok erfordert Cookies für dieses Video. "
-                "Bitte exportiere deine Browser-Cookies und konfiguriere yt-dlp entsprechend."
-            )
+    """Raise a clear error for TikTok connectivity/auth issues."""
+    if "tiktok" not in url.lower():
+        return
+    err_lower = stderr.lower()
+    if any(p in err_lower for p in ["connection refused", "failed to establish", "unable to download webpage"]):
+        raise RuntimeError(
+            "TikTok ist vom Server nicht erreichbar (Verbindung verweigert). "
+            "Möglicherweise blockiert die installierte yt-dlp-Version TikTok. "
+            "Bitte Docker-Image neu bauen: docker compose up -d --build"
+        )
+    if any(p in err_lower for p in ["login", "cookie", "captcha", "403"]):
+        raise RuntimeError(
+            "TikTok erfordert Cookies für dieses Video. "
+            "Exportiere Browser-Cookies und setze YTDLP_COOKIES_FILE=/pfad/cookies.txt in der .env."
+        )

@@ -157,9 +157,29 @@ Der Extraktions-Endpoint streamt drei Event-Typen:
 - **`result`** -- Fertiges Rezept als JSON (`ExtractResponse`)
 - **`error`** -- Fehlermeldung
 
+## Bekannte Probleme & Loesungen
+
+### TikTok: Verbindung verweigert im Docker-Container (Pi-hole)
+
+Wenn Pi-hole als DNS-Server im Heimnetzwerk laeuft, kann der Docker-Container TikTok-Domains nicht aufloesen — Pi-hole gibt eine Sinkhole-IP zurueck, die Verbindung wird sofort verweigert. Ausserhalb des Containers funktioniert TikTok normal, weil der Pi-Host einen anderen DNS-Pfad nutzt.
+
+**Loesung**: In `docker-compose.yml` einen oeffentlichen DNS-Server eintragen:
+
+```yaml
+services:
+  rezeptor:
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+```
+
+Danach `docker compose up -d` (kein Rebuild noetig).
+
+---
+
 ## Technische Hinweise
 
-- **yt-dlp** wird immer als Subprocess aufgerufen (`asyncio.create_subprocess_exec`), nie ueber die Python-API, um den Event-Loop nicht zu blockieren
+- **yt-dlp** wird immer als Subprocess aufgerufen (`subprocess.run` via `loop.run_in_executor()`), nie ueber die Python-API, um den Event-Loop nicht zu blockieren
 - **Whisper** hat ein Dateigroessen-Limit von 25 MB -- zu lange Videos fuehren zu einem Fehler
 - **recipe-scrapers** laedt HTML selbststaendig -- es wird die URL uebergeben, nicht vorgeladenes HTML
 - **Bild-Upload** nach Tandoor erfolgt per `PATCH` mit Multipart -- der `Content-Type`-Header wird nicht manuell gesetzt

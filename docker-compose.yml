@@ -15,7 +15,6 @@ services:
       - TMP_DIR
       - APP_HOST
       - APP_PORT
-      - FFMPEG_LOCATION
       - APP_UID
       - APP_GID
     ports:
@@ -25,3 +24,6 @@ services:
       - ${REZEPTOR_DATA_DIR:-./data}:/app/data
     mem_limit: 512m
     memswap_limit: 512m   # No swap – protect SD card
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
