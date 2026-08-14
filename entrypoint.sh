@@ -4,7 +4,9 @@ set -e
 APP_UID=${APP_UID:-1000}
 APP_GID=${APP_GID:-1000}
 
-# Fix ownership of mounted volumes so the app user can write to them
+# Mounted volumes start out empty on a fresh host, and a mount hides anything the
+# image created at these paths — so create the directories here, not at build time
+mkdir -p /app/tmp /app/data/images
 chown "${APP_UID}:${APP_GID}" /app/tmp /app/data /app/data/images
 
 # Self-update yt-dlp on every container start (Instagram/TikTok break old versions).
