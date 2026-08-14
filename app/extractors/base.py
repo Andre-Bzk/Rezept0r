@@ -3,6 +3,8 @@ import re
 
 VIDEO_PATTERNS = [
     r"youtube\.com/watch",
+    r"youtube\.com/shorts/",
+    r"youtube\.com/live/",
     r"youtu\.be/",
     r"tiktok\.com/",
     r"instagram\.com/reel",
