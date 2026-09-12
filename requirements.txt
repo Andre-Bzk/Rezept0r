@@ -13,3 +13,6 @@ lxml==6.1.1
 openai==2.46.0
 python-dotenv==1.2.2
 aiofiles==25.1.0
+# Not imported by the app: the yt-dlp binary runs on this interpreter and needs
+# curl_cffi for browser impersonation, without which TikTok rejects requests
+curl_cffi==0.16.3
